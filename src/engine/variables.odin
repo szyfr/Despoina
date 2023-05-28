@@ -25,3 +25,8 @@ surface : ^sdl2.Surface
 event	:  sdl2.Event
 
 running := true
+
+
+rom			: []u8
+cpu			: ^CPU
+memoryMap	: [0xFFFF]u8
