@@ -46,13 +46,19 @@ update  :: proc() {
 	//* Hypothetical 500KHz
 	//* Techinally a DMG 2MHz
 	//? Operates at ~22.5fps w/o empty cycle
-	for i in 0..<8333333 {
-		cycle()
-	}
+	//for i in 0..<8333333 {
+	//	cycle()
+	//}
 	//* Hypothetical 250KHz
 	//* Techinally a DMG 2MHz
 	//? Operates at ~22.5fps w/o empty cycle
 	//for i in 0..<2083333 {
 	//	cycle()
 	//}
+	//* Hypothetical 250KHz
+	//* Techinally a DMG 2MHz
+	//? Operates at ~22.5fps w/o empty cycle
+	for i in 0..<1000 {
+		cycle()
+	}
 }
