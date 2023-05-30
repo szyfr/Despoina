@@ -53,6 +53,7 @@ main :: proc() {
 	//* Init CPU
 	cpu = new(CPU)
 	cpu.pc = 0x0100
+	cpu.sp = 0xFFFF
 	cpu.curCyc = 1
 	cpu.curOp = Instruction(memoryMap[cpu.pc])
 	memoryMap[0xFE00] = 1
@@ -68,20 +69,24 @@ main :: proc() {
 			case .DROPFILE:
 				fmt.printf("%v\n",event.drop.file)
 			case .KEYDOWN:
-				if event.key.keysym.sym == .RETURN {//&& event.key.repeat == 0 && !keyStopper {
+				if event.key.keysym.sym == .F10 && event.key.repeat == 0 && !keyStopper {
+					keyStopper = true
+					play = !play
+				}
+				if event.key.keysym.sym == .F11 && event.key.repeat == 0 && !keyStopper {
 					keyStopper = true
 					cycle()
 				}
-				if event.key.keysym.sym == .O && event.key.repeat == 0 && !keyStopper {
+				if event.key.keysym.sym == .F9 && event.key.repeat == 0 && !keyStopper {
 					keyStopper = true
-					fmt.printf("A: %2X\nBC: %4X\nXY: %4X\n\n",cpu.a,cpu.bc,cpu.xy)
+					fmt.printf("A: %2X\nF: %8b\nBC: %4X\nXY: %4X\n\n",cpu.a,cpu.f,cpu.bc,cpu.xy)
 					for i in 0..<20 {
 						fmt.printf("%2X-",vram[i])
 					}
 					fmt.printf("\n")
 				}
 			case .KEYUP:
-				if (event.key.keysym.sym == .RETURN || event.key.keysym.sym == .O) && event.key.repeat == 0 && keyStopper {
+				if (event.key.keysym.sym == .F10 || event.key.keysym.sym == .F11 ) && event.key.repeat == 0 && keyStopper {
 					keyStopper = false
 				}
 		}
@@ -90,7 +95,9 @@ main :: proc() {
 		fps := frames / (f64(timer_getticks(fpsTimer)) / 1000)
 
 		//* Update
-		update()
+		if play {
+			update()
+		}
 		//thread.run(update)
 
 		//* Draw
@@ -107,43 +114,49 @@ main :: proc() {
 		frames += 1
 		frameTicks := timer_getticks(capTimer)
 		if frameTicks < SCREEN_TICKS_PER_FRAME do sdl2.Delay( SCREEN_TICKS_PER_FRAME - frameTicks )
-		//fmt.printf("%v\n",fps)
+		fmt.printf("%v\n",fps)
 	}
 
 }
 
 draw :: proc() {
-	for i in 0..<(144*160)/4 {
-		//graphics.draw_pixel(
-		//	i32(i%160), i32(i/160),
-		//	[4]u8{
-		//		engine.vram[(i * 3)],
-		//		engine.vram[(i * 3)+1],
-		//		engine.vram[(i * 3)+2],
-		//		255},
-		//)
+	pixelPos := 0
+	for i in 0..<23040/4 {
 		for o in 0..<4 {
 			color : engine.Color = get_color( engine.vram[i], u8(o) )
 			graphics.draw_pixel(
-				i32(i%160), i32(i/160),
+				i32(pixelPos%160), i32(pixelPos/160),
 				color,
 			)
+			pixelPos+=1
 		}
 	}
-	off += 1
 
 	sdl2.UpdateWindowSurface( engine.window )
 }
 
 get_color :: proc( input : u8, pos : u8 ) -> engine.Color {
-	value : u8 = input << pos * 2
+	value : u8 = input << (pos * 2)
 	color : engine.Color
 
-	switch {
-		case (value | 0b00000000) != 0: color = engine.COL_0
-		case (value | 0b01000000) != 0: color = engine.COL_1
-		case (value | 0b10000000) != 0: color = engine.COL_2
-		case (value | 0b11000000) != 0: color = engine.COL_3
-	}
+	if (value & 0b00000000) == 0b00000000 do color = engine.COL_0
+	if (value & 0b01000000) == 0b01000000 do color = engine.COL_1
+	if (value & 0b10000000) == 0b10000000 do color = engine.COL_2
+	if (value & 0b11000000) == 0b11000000 do color = engine.COL_3
+
+	//switch {
+	//	case (value & 0b00000000) == 0b00000000:
+	//		color = engine.COL_0
+	//	//	fmt.printf("col1\n")
+	//	case (value & 0b01000000) == 0b01000000:
+	//		color = engine.COL_1
+	//	//	fmt.printf("col2\n")
+	//	case (value & 0b10000000) == 0b10000000:
+	//		color = engine.COL_2
+	//	//	fmt.printf("col3\n")
+	//	case (value & 0b11000000) == 0b11000000:
+	//		color = engine.COL_3
+	//	//	fmt.printf("col4\n")
+	//}
 	return color
 }

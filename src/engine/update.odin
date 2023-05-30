@@ -58,7 +58,7 @@ update  :: proc() {
 	//* Hypothetical 250KHz
 	//* Techinally a DMG 2MHz
 	//? Operates at ~22.5fps w/o empty cycle
-	for i in 0..<1000 {
+	for i in 0..<10000 {
 		cycle()
 	}
 }

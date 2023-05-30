@@ -27,17 +27,59 @@
 |  |  |  |  |
 
 
+## CPU Registers and Flags
+
+### Registers
+
+| 16-bit | Hi | Lo | Name / Function |
+|--|--|--|--|
+| AF | A | - | Accumulator & Flags |
+| BC | B | C | BC |
+| DE | D | E | DE |
+| XY | - | - | XY |
+| SP | - | - | Stack Pointer |
+| PC | - | - | Program Counter |
+
+### Flags
+
+| Bit | Name | Description |
+|--|--|--|
+| 7 | z | Zero flag |
+| 6 | c | Carry flag |
+
 ## Instruction Set
   
-| Encoding | Mnemonic | cycles | Description |
+| Encoding | Mnemonic | Cycles | Description |
 |--|--|--|--|
+|  |
 | 00 | nop | 1 | Nothing |
+| 01 | halt | 1 | Stops CPU operation until interrupt |
 | 10 | ld a,b | 1 | a = b |
+| 20 | ld b,a | 1 | b = a |
 | 11 | ld a,c | 1 | a = c |
-| 20 | ld a,[xy] | 2 | a = [xy] |
-| 21 | ld [xy],a | 2 | [xy] = a |
-| 22 | ld nnnn,a | 4 | [nnnn] = a |
-| 23 nn | ld a,nn | 2 | a = nn |
-| 24 nn nn | ld xy,nnnn | 3 | xy = nnnn |
-| 34 | inc xy | 2 | xy += 1 |
-| 40 nn nn | jp nnnn | 4 | Jump to nnnn, pc = nnnn |
+| 21 | ld c,a | 1 | c = a |
+| 12 | ld a,[bc] | 2 | a = [bc] |
+| 22 | ld [bc],a | 2 | [bc] = a |
+| 13 | ld a,[xy] | 2 | a = [xy] |
+| 23 | ld [xy],a | 2 | [xy] = a |
+| 14 nn | ld a,nn | 2 | a = nn |
+| 15 nn nn | ld [nnnn],a | 4 | [nnnn] = a |
+| 25 nn nn | ld a,[nnnn] | 4 | a = [nnnn] |
+| 16 nn nn | ld bc,nnnn | 3 | bc = nnnn |
+| 26 nn nn | ld xy,nnnn | 3 | xy = nnnn |
+| 30 | inc a | 1 | a += 1 |
+| 40 | dec a | 1 | a -= 1 |
+| 33 | inc xy | 2 | xy += 1 |
+| 43 | dec xy | 2 | xy -= 1 |
+| 34 | push af | 4 | Puts af onto stack |
+| 44 | pop af | 3 | Takes off the stack and puts into af |
+| 50 nn nn | jp nnnn | 4 | Jump to nnnn, pc = nnnn |
+| 51 nn nn | jp nz,nnnn | 4/3 | Jump to nnnn if zero flag is not set |
+| 56 nn nn | cmp bc,nn | 3 | bc - nn and sets flags but preserves bc |
+| 66 nn nn | cmp xy,nn | 3 | xy - nn and sets flags but preserves xy |
+|  |  |  |  |
+| 84 nn nn | add xy,nn | 3 | xy += nn |
+|  |  |  |  |
+|  |  |  |  |
+
+|  |  |  |  |
